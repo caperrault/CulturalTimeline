@@ -4,6 +4,7 @@
 
 .link {
   stroke: #ccc;
+  stroke-opacity: 0;
 }
 
 .node text {
@@ -25,8 +26,9 @@ var svg = d3.select("body").append("svg")
 
 var force = d3.layout.force()
     .gravity(.05)
-    .distance(100)
-    .charge(-100)
+  //  .distance(100)
+  //.linkDistance(10)
+    .charge(-10)
     .size([width, height]);
 
 d3.json("graph2.json", function(error, json) {
@@ -49,12 +51,15 @@ d3.json("graph2.json", function(error, json) {
       .call(force.drag);
 
   node.append("image")
-      //.attr("xlink:href", "https://github.com/favicon.ico")
       .attr("xlink:href", function(d) { return "img/" + d.name + ".jpg"; })
       .attr("x", -8)
       .attr("y", -8)
       .attr("width", 16)
       .attr("height", 16);
+
+  node.forEach(function (o) {
+    o.y = 0;
+  });
 
   /*node.append("text")
       .attr("dx", 12)
@@ -69,6 +74,34 @@ d3.json("graph2.json", function(error, json) {
 
     node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
   });
+
+  function collide(node) {
+  var r = rScale(node.value) + 16,
+      nx1 = node.x - r,
+      nx2 = node.x + r,
+      ny1 = node.y - r,
+      ny2 = node.y + r;
+  return function(quad, x1, y1, x2, y2) {
+    if (quad.point && (quad.point !== node)) {
+      var x = node.x - quad.point.x,
+          y = node.y - quad.point.y,
+          l = Math.sqrt(x * x + y * y),
+          r = rScale(node.value) + rScale(quad.point.value);
+      if (l < r) {
+        l = (l - r) / l * .5;
+        node.x -= x *= l;
+        node.y -= y *= l;
+        quad.point.x += x;
+        quad.point.y += y;
+      }
+    }
+    return x1 > nx2
+        || x2 < nx1
+        || y1 > ny2
+        || y2 < ny1;
+  };
+}
+
 });
 
 </script>
