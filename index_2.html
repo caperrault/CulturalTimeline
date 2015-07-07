@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+    background-color: #000;
+}
+
+.link {
+  stroke: #ccc;
+  stroke-opacity: 0;
+}
+
+.node text {
+  pointer-events: none;
+  font: 10px sans-serif;
+}
+
+</style>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script type="text/javascript" src="http://dutovis.com/forceInABox/forceInABox.js"></script>
+<script>
+
+var width = 1500,
+    height = 800;
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var force;
+
+// var force = d3.layout.force()
+//     .gravity(.05)
+//     .charge(-10)
+//     .size([width, height]);
+
+var xScale = d3.scale.linear().range([1980,2015]).domain([50,width-50]);
+
+function update(nodes) {
+    force = d3.layout.force()
+        .nodes(nodes)
+        .size([width/2, height/2])
+        .charge(-5)
+        .gravity(0.1)
+        .on("tick", tick)
+        .start();
+
+var circle = svg.append("svg:g").selectAll("circle")
+    .data(force.nodes())
+  .enter().append("svg:circle")
+    .attr("r", 50)
+    .style("fill", "red")
+    .call(force.drag);
+
+    function tick(e) {
+
+      nodes.forEach(function(o) {
+        o.x = 200;
+        //  o.x = xScale(o.year);
+        //  q.visit(collide(o));
+      });
+
+    //  force.onTick(e);
+
+    // nodes.append("image")
+    //     .attr("xlink:href", function(d) { return "img/" + d.name + ".jpg"; })
+    //     .attr("x", -8)
+    //     .attr("y", -8)
+    //     .attr("width", 16)
+    //     .attr("height", 16);
+
+      // circle.attr("transform", function(d) {
+      //   return "translate(" + d.x + "," + d.y + ")";
+      // });
+
+    }
+}
+
+d3.json("graph2.json", function(error, json) {
+
+  // force.nodes(json.nodes)
+  //     .start();
+
+  update(json.nodes);
+
+  // var node = svg.selectAll(".node")
+  //     .data(json.nodes)
+  //   .enter().append("g")
+  //     .attr("class", "node")
+  //     .call(force.drag);
+
+  // nodes.append("image")
+  //     .attr("xlink:href", function(d) { return "img/" + d.name + ".jpg"; })
+  //     .attr("x", -8)
+  //     .attr("y", -8)
+  //     .attr("width", 16)
+  //     .attr("height", 16);
+
+  // force.on("tick", function() {
+  //
+  //   node.forEach(function(o) {
+  //       //o.y = 100;
+  //       //  o.x = xScale(o.year);
+  //           o.x = 0;
+  //         // q.visit(collide(o));
+  //     })
+  //
+  //   node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+  // });
+
+});
+
+</script>
